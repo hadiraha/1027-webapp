@@ -22,6 +22,7 @@ try:
         "app.main:app",
         host="127.0.0.1",
         port=8000,
+        log_config=None,
         log_level="debug"
     )
 except Exception as e:
