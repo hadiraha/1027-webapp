@@ -14,11 +14,10 @@ def get_companies(db: Session):
     return db.query(models.Company).all()
 
 def create_company(db: Session, data: schemas.CompanyCreate):
-    clean = {k: (None if v in ["", None] or str(v) == "nan" else v) for k, v in data.dict().items()}
+    clean = {k: (None if v in ["", None] or str(v) == "nan" else v)
+             for k, v in data.dict().items()}
     item = models.Company(**clean)
     db.add(item)
-    db.commit()
-    db.refresh(item)
     return item
 
 def update_company(db: Session, id: int, data: schemas.CompanyCreate):

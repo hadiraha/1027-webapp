@@ -14,30 +14,32 @@ router = APIRouter()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-def token_required(Authorization: str = Header(None), db: Session = Depends(get_db)):
-    if Authorization is None:
-        raise HTTPException(status_code=401, detail="Missing token")
-    token = Authorization.replace("Bearer ", "")
-    user = get_current_user(token, db)
-    return user
+# def token_required(Authorization: str = Header(None), db: Session = Depends(get_db)):
+#     if Authorization is None:
+#         raise HTTPException(status_code=401, detail="Missing token")
+#     token = Authorization.replace("Bearer ", "")
+#     user = get_current_user(token, db)
+#     return user
 
 
 def clean_value(v):
     return None if (v is None or (isinstance(v, float) and math.isnan(v))) else v
 
-# -----------------------------------------------------
-# GET LIST
-# -----------------------------------------------------
 @router.get("/")
-def get_list(user=Depends(token_required), db: Session = Depends(get_db)):
+def get_list(
+    user = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return db.query(Company).all()
+
+@router.get("/")
+def get_list(user=Depends(get_current_user), db: Session = Depends(get_db)):
     return db.query(Company).all()
 
 
-# -----------------------------------------------------
-# ADD SINGLE RECORD
-# -----------------------------------------------------
+
 @router.post("/")
-def add_company(data: dict, user=Depends(token_required), db: Session = Depends(get_db)):
+def add_company(data: dict, user=Depends(get_current_user), db: Session = Depends(get_db)):
     obj = Company(**data)
     db.add(obj)
     db.commit()
@@ -50,7 +52,7 @@ def add_company(data: dict, user=Depends(token_required), db: Session = Depends(
 @router.post("/upload")
 async def upload_excel(
         file: UploadFile = File(...),
-        user=Depends(token_required),
+        user=Depends(get_current_user),
         db: Session = Depends(get_db),
 ):
     file_path = f"{UPLOAD_DIR}/{file.filename}"

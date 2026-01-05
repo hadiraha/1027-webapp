@@ -34,28 +34,18 @@ async function loadData() {
 
 loadData();
 
-async function uploadExcel(){
-  const file = document.getElementById("file").files[0];
-  const form = new FormData();
-  form.append("file", file);
 
-  const res = await fetch("/companies/upload", {
-    method: "POST",
-    body: form
-  });
-
-  alert("Import success, refresh dashboard");
-  location.reload();
-}
-
-function logout(){
+function logout() {
   localStorage.removeItem("token");
-  window.location = "/login";
+  window.location = "/static/login.html";
 }
 
 async function uploadExcel() {
   const fileInput = document.getElementById("file");
-  if (!fileInput.files.length) return alert("Please select file");
+  if (!fileInput.files.length) {
+    alert("Please select file");
+    return;
+  }
 
   const form = new FormData();
   form.append("file", fileInput.files[0]);
@@ -70,8 +60,13 @@ async function uploadExcel() {
     body: form
   });
 
+  if (!res.ok) {
+    alert("Upload failed (auth or server error)");
+    return;
+  }
+
   const data = await res.json();
   alert("Imported: " + data.imported_rows + " rows");
 
-  loadCompanies();
+  loadData(); // reload table correctly
 }

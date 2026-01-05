@@ -3,7 +3,7 @@ import os
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-
+from fastapi.responses import RedirectResponse
 from app.database import Base, engine, SessionLocal
 from app.models import User
 from app.auth import hash_password
@@ -12,25 +12,28 @@ Base.metadata.create_all(bind=engine)
 
 def create_first_admin():
     db = SessionLocal()
-    existing = db.query(User).filter(User.username == "admin").first()
-    if existing is None:
-        admin = User(
-            username="admin",
-            hashed_password=hash_password("123456"),
-            role="admin"
-        )
-        db.add(admin)
-        db.commit()
-        print("✔ First admin created → username: admin , password: 123456")
-    else:
-        print("✔ Admin already exists")
-    db.close()
+    try:
+        admin_exists = db.query(User).filter(User.username == "admin").first()
+        if not admin_exists:
+            admin = User(
+                username="admin",
+                hashed_password=hash_password("123456"),
+                role="admin"
+            )
+            db.add(admin)
+            db.commit()
+            print("Default admin created (username: admin | password: 123456)")
+        else:
+            print("Admin already exists")
+    except Exception as e:
+        print("Failed to create admin:", e)
+    finally:
+        db.close()
+
 
 create_first_admin()
 
-# ---------------------------
-# FastAPI Init
-# ---------------------------
+
 app = FastAPI(title="Project System API")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -46,25 +49,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------
-# Routers Import
-# ---------------------------
+
 from app.routes_users import router as users_router
 from app.routes_companies import router as companies_router
 
-app.include_router(users_router, prefix="/users", tags=["users"])
-app.include_router(companies_router, prefix="/companies", tags=["companies"])
+app.include_router(users_router, prefix="/users", tags=["Users"])
+app.include_router(companies_router, prefix="/companies", tags=["Companies"])
+ 
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse("/static/login.html")
 
 
-# Home redirect to login
-@app.get("/")
-def home():
-    return {"status": "OK", "message": "Backend Running!"}
 
 
-# ---------------------------
-# Allow run via "python main.py"
-# ---------------------------
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
