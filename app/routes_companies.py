@@ -8,11 +8,17 @@ from app.schemas import CompanyCreate
 import pandas as pd
 import math
 import os
+from app.utils import base_path
+
 
 router = APIRouter()
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = os.path.join(base_path(), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+# UPLOAD_DIR = "uploads"
+# os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # def token_required(Authorization: str = Header(None), db: Session = Depends(get_db)):
 #     if Authorization is None:

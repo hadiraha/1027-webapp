@@ -1,1 +1,0 @@
-pyinstaller --onefile --noconsole --add-data "app;app" --add-data "static;static" --collect-all fastapi --collect-all starlette --collect-all uvicorn --collect-all sqlalchemy --collect-all jose --collect-all passlib --collect-all bcrypt --collect-all pandas --collect-all openpyxl --collect-all mysql --collect-all mysql_connector_python run_app.py

@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from app.database import Base, engine, SessionLocal
 from app.models import User
 from app.auth import hash_password
+from app.utils import base_path
 
 Base.metadata.create_all(bind=engine)
 
@@ -36,9 +37,15 @@ create_first_admin()
 
 app = FastAPI(title="Project System API")
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "static")
+# BASE_DIR = base_path()
+STATIC_DIR = os.path.join(base_path(), "static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# STATIC_DIR = os.path.join(os.path.dirname(BASE_DIR), "static")
+# app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # CORS
 app.add_middleware(

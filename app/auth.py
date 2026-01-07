@@ -9,7 +9,10 @@ from sqlalchemy.orm import Session
 import os
 from fastapi.security import OAuth2PasswordBearer
 from dotenv import load_dotenv
-load_dotenv()
+from app.utils import base_path
+
+
+load_dotenv(os.path.join(base_path(), ".env"))
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

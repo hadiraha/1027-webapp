@@ -3,8 +3,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
 import os
 import sys
+from app.utils import base_path
 
-load_dotenv()
+load_dotenv(os.path.join(base_path(), ".env"))
+
 
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
